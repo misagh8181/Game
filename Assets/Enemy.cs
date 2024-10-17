@@ -1,5 +1,6 @@
 using Script;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Enemy : MonoBehaviour
 {
@@ -16,16 +17,26 @@ public class Enemy : MonoBehaviour
     private Vector2 _castlePositionTarget;
     private GameManager _gameManager;
     private float _timeSinceLastAttack;
+    private Canvas _canvas;
+    private Slider _slider;
+
 
     private void Start()
     {
+        health = Random.Range(50, maxHealth); // Set the enemy's health to maximum at the start
+        _canvas = GetComponentInChildren<Canvas>();
+        _slider = _canvas.GetComponentInChildren<Slider>();
+        _slider.value = _slider.maxValue = health;
+        _slider.minValue = 0;
+        _canvas.worldCamera = Camera.main;
+
         _gameManager = FindObjectOfType<GameManager>();
         _castlePositionTarget =
             Utils.GetRandomPositionInBounds(GameObject.FindWithTag("Castle").GetComponent<BoxCollider2D>().bounds);
         Debug.Log(_castlePositionTarget);
-        health = Random.Range(50, maxHealth); // Set the enemy's health to maximum at the start
         _spriteRenderer = GetComponent<SpriteRenderer>(); // Get the SpriteRenderer component
         UpdateColor(); // Set initial color based on health
+        UpdateSliderColor();
     }
 
     private void Update()
@@ -63,7 +74,9 @@ public class Enemy : MonoBehaviour
     {
         health -= damage;
         health = Mathf.Clamp(health, 0, maxHealth); // Ensure health stays within bounds
+        _slider.value = health;
         UpdateColor(); // Update color based on health
+        UpdateSliderColor();
 
         if (health <= 0)
         {
@@ -93,6 +106,7 @@ public class Enemy : MonoBehaviour
         else if (other.CompareTag("Castle"))
         {
             other.GetComponent<Castle>().TakeDamage(10);
+            _gameManager.EnemyReachedCastle();
             Destroy(gameObject);
         }
     }
@@ -103,5 +117,12 @@ public class Enemy : MonoBehaviour
         {
             _currentSoldier = null;
         }
+    }
+
+    private void UpdateSliderColor()
+    {
+        var healthPercent = Mathf.InverseLerp(_slider.minValue, _slider.maxValue, health);
+        var newColor = Color.Lerp(Color.red, Color.green, healthPercent);
+        _slider.GetComponentInChildren<Image>().color = newColor;
     }
 }

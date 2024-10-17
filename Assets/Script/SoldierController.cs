@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Script
 {
@@ -10,8 +11,20 @@ namespace Script
         public float attackRange = 1.5f; // Range within which the unit can attack
         public float attackCooldown = 1f; // Time between attacks
 
-        private Enemy targetEnemy; // The current enemy target
-        private float timeSinceLastAttack = 0f;
+        private Enemy _targetEnemy; // The current enemy target
+        private float _timeSinceLastAttack;
+        private Canvas _canvas;
+        private Slider _slider;
+
+        private void Start()
+        {
+            _canvas = GetComponentInChildren<Canvas>();
+            _slider = _canvas.GetComponentInChildren<Slider>();
+            _slider.value = _slider.maxValue = health;
+            _slider.minValue = 0;
+            _canvas.worldCamera = Camera.main;
+            UpdateSliderColor();
+        }
 
         void Update()
         {
@@ -19,20 +32,22 @@ namespace Script
             if (health > 0)
             {
                 // If there's no target, find the nearest enemy
-                if (!targetEnemy || targetEnemy.health <= 0)
+                if (!_targetEnemy || _targetEnemy.health <= 0)
                 {
                     FindNextEnemy();
                 }
 
                 // Move toward the target if there's an enemy
-                if (targetEnemy != null)
+                if (_targetEnemy)
                 {
-                    MoveTowardsEnemy();
-
                     // If the unit is within range, attack the enemy
-                    if (Vector2.Distance(transform.position, targetEnemy.transform.position) <= attackRange)
+                    if (Vector2.Distance(transform.position, _targetEnemy.transform.position) <= attackRange)
                     {
                         AttackEnemy();
+                    }
+                    else
+                    {
+                        MoveTowardsEnemy();
                     }
                 }
             }
@@ -50,7 +65,7 @@ namespace Script
                 if (distance < minDistance && enemy.health > 0)
                 {
                     minDistance = distance;
-                    targetEnemy = enemy;
+                    _targetEnemy = enemy;
                 }
             }
         }
@@ -58,27 +73,28 @@ namespace Script
         void MoveTowardsEnemy()
         {
             // Move the unit towards the enemy's position
-            Vector2 direction = (targetEnemy.transform.position - transform.position).normalized;
+            Vector2 direction = (_targetEnemy.transform.position - transform.position).normalized;
             transform.position =
-                Vector2.MoveTowards(transform.position, targetEnemy.transform.position, speed * Time.deltaTime);
+                Vector2.MoveTowards(transform.position, _targetEnemy.transform.position, speed * Time.deltaTime);
         }
 
         void AttackEnemy()
         {
             // Only attack if enough time has passed since the last attack
-            timeSinceLastAttack += Time.deltaTime;
+            _timeSinceLastAttack += Time.deltaTime;
 
-            if (timeSinceLastAttack >= attackCooldown)
+            if (_timeSinceLastAttack >= attackCooldown)
             {
-                targetEnemy.TakeDamage(attackDamage);
-                timeSinceLastAttack = 0f; // Reset the attack cooldown
+                _targetEnemy.TakeDamage(attackDamage);
+                _timeSinceLastAttack = 0f; // Reset the attack cooldown
             }
         }
 
         public void TakeDamage(int damage)
         {
             health -= damage;
-            Debug.Log("Soldier health: " + health);
+            _slider.value = health;
+            UpdateSliderColor();
 
             if (health <= 0)
             {
@@ -90,6 +106,13 @@ namespace Script
         {
             // Handle unit death (e.g., play death animation, destroy object)
             Destroy(gameObject);
+        }
+
+        private void UpdateSliderColor()
+        {
+            var healthPercent = Mathf.InverseLerp(_slider.minValue, _slider.maxValue, health);
+            var newColor = Color.Lerp(Color.red, Color.green, healthPercent);
+            _slider.GetComponentInChildren<Image>().color = newColor;
         }
     }
 }
