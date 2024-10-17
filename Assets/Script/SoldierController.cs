@@ -15,11 +15,13 @@ namespace Script
         private float _timeSinceLastAttack;
         private Canvas _canvas;
         private Slider _slider;
+        private Image _getSliderImage;
 
         private void Start()
         {
             _canvas = GetComponentInChildren<Canvas>();
             _slider = _canvas.GetComponentInChildren<Slider>();
+            _getSliderImage = _slider.GetComponentInChildren<Image>();
             _slider.value = _slider.maxValue = health;
             _slider.minValue = 0;
             _canvas.worldCamera = Camera.main;
@@ -53,32 +55,29 @@ namespace Script
             }
         }
 
-        void FindNextEnemy()
+        private void FindNextEnemy()
         {
             // Find the nearest enemy
-            Enemy[] enemies = FindObjectsOfType<Enemy>();
-            float minDistance = Mathf.Infinity;
+            var enemies = FindObjectsOfType<Enemy>();
+            var minDistance = Mathf.Infinity;
 
             foreach (Enemy enemy in enemies)
             {
-                float distance = Vector2.Distance(transform.position, enemy.transform.position);
-                if (distance < minDistance && enemy.health > 0)
-                {
-                    minDistance = distance;
-                    _targetEnemy = enemy;
-                }
+                var distance = Vector2.Distance(transform.position, enemy.transform.position);
+                if (!(distance < minDistance) || enemy.health <= 0) continue;
+                minDistance = distance;
+                _targetEnemy = enemy;
             }
         }
 
-        void MoveTowardsEnemy()
+        private void MoveTowardsEnemy()
         {
             // Move the unit towards the enemy's position
-            Vector2 direction = (_targetEnemy.transform.position - transform.position).normalized;
             transform.position =
                 Vector2.MoveTowards(transform.position, _targetEnemy.transform.position, speed * Time.deltaTime);
         }
 
-        void AttackEnemy()
+        private void AttackEnemy()
         {
             // Only attack if enough time has passed since the last attack
             _timeSinceLastAttack += Time.deltaTime;
@@ -112,7 +111,7 @@ namespace Script
         {
             var healthPercent = Mathf.InverseLerp(_slider.minValue, _slider.maxValue, health);
             var newColor = Color.Lerp(Color.red, Color.green, healthPercent);
-            _slider.GetComponentInChildren<Image>().color = newColor;
+            _getSliderImage.color = newColor;
         }
     }
 }

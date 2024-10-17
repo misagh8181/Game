@@ -1,42 +1,33 @@
 using Script;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Enemy : MonoBehaviour
 {
     public int maxHealth = 500; // Maximum health of the enemy
     public int health; // Current health of the enemy
     public int damageToUnit = 20; // Damage the enemy deals to a unit
+    public int damageToCastle = 10; // Damage the enemy deals to a unit
     public float speed = 2f; // Speed of movement towards the castle
-    public int maxColorHealth = 500; // Health at which the enemy is fully red
-    public int minColorHealth = 20; // Health at which the enemy is fully green
     public float attackCooldown = 1f; // Time between attacks
 
     private SoldierController _currentSoldier; // Reference to the unit currently engaged with this enemy
-    private SpriteRenderer _spriteRenderer;
     private Vector2 _castlePositionTarget;
     private GameManager _gameManager;
     private float _timeSinceLastAttack;
-    private Canvas _canvas;
-    private Slider _slider;
-
+    private UIEnemy _uiEnemy;
+    private Animator _animator;
 
     private void Start()
     {
-        health = Random.Range(50, maxHealth); // Set the enemy's health to maximum at the start
-        _canvas = GetComponentInChildren<Canvas>();
-        _slider = _canvas.GetComponentInChildren<Slider>();
-        _slider.value = _slider.maxValue = health;
-        _slider.minValue = 0;
-        _canvas.worldCamera = Camera.main;
-
         _gameManager = FindObjectOfType<GameManager>();
+        _animator = GetComponent<Animator>();
+        _uiEnemy = GetComponent<UIEnemy>();
+        _uiEnemy.StartHealth(maxHealth);
+
+        health = Random.Range(50, maxHealth);
+
         _castlePositionTarget =
             Utils.GetRandomPositionInBounds(GameObject.FindWithTag("Castle").GetComponent<BoxCollider2D>().bounds);
-        Debug.Log(_castlePositionTarget);
-        _spriteRenderer = GetComponent<SpriteRenderer>(); // Get the SpriteRenderer component
-        UpdateColor(); // Set initial color based on health
-        UpdateSliderColor();
     }
 
     private void Update()
@@ -74,9 +65,9 @@ public class Enemy : MonoBehaviour
     {
         health -= damage;
         health = Mathf.Clamp(health, 0, maxHealth); // Ensure health stays within bounds
-        _slider.value = health;
-        UpdateColor(); // Update color based on health
-        UpdateSliderColor();
+        _uiEnemy.Slider.value = health;
+        _uiEnemy.UpdateSliderColor();
+        _uiEnemy.SetHealth(health);
 
         if (health <= 0)
         {
@@ -84,45 +75,32 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    void Die()
+    private void Die()
     {
         _gameManager.EnemyDefeated();
         Destroy(gameObject);
     }
 
-    void UpdateColor()
-    {
-        float healthPercent = Mathf.InverseLerp(minColorHealth, maxColorHealth, health);
-        Color newColor = Color.Lerp(Color.green, Color.red, healthPercent);
-        _spriteRenderer.color = newColor;
-    }
-
-    void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Soldier"))
         {
+            _animator.SetTrigger("Engage");
             _currentSoldier = other.GetComponent<SoldierController>();
         }
         else if (other.CompareTag("Castle"))
         {
-            other.GetComponent<Castle>().TakeDamage(10);
-            _gameManager.EnemyReachedCastle();
+            _gameManager.EnemyReachedCastle(damageToCastle);
             Destroy(gameObject);
         }
     }
 
-    void OnTriggerExit2D(Collider2D other)
+    private void OnTriggerExit2D(Collider2D other)
     {
         if (other.CompareTag("Soldier"))
         {
+            _animator.SetTrigger("Engage");
             _currentSoldier = null;
         }
-    }
-
-    private void UpdateSliderColor()
-    {
-        var healthPercent = Mathf.InverseLerp(_slider.minValue, _slider.maxValue, health);
-        var newColor = Color.Lerp(Color.red, Color.green, healthPercent);
-        _slider.GetComponentInChildren<Image>().color = newColor;
     }
 }

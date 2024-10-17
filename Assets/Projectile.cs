@@ -1,10 +1,10 @@
-using System;
 using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
     public float speed = 10f; // Horizontal speed
     public float arcHeight = 5f; // Controls the height of the arc
+    public int damage = 100;
     private Vector2 startPosition;
     private Vector2 targetPosition;
     private float timeElapsed;
@@ -35,7 +35,7 @@ public class Projectile : MonoBehaviour
         transform.position = new Vector2(xPosition, yPosition + arc);
 
         // Smoothly rotate the arrow from -45° to -135° based on its progress
-        float rotationAngle = Mathf.Lerp(-45f, -135f, progress);
+        float rotationAngle = Mathf.Lerp(-45f, -170f, progress);
         transform.rotation = Quaternion.Euler(0, 0, rotationAngle);
 
         // Destroy the arrow if it has reached its target
@@ -49,7 +49,7 @@ public class Projectile : MonoBehaviour
     {
         if (other.CompareTag("Enemy"))
         {
-            other.GetComponent<Enemy>().TakeDamage(10);
+            other.GetComponent<Enemy>().TakeDamage(damage);
             Destroy(gameObject);
         }
     }
