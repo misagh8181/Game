@@ -50,6 +50,11 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        if (PlayerPrefs.GetInt("level", 0) == 0)
+        {
+            PlayerPrefs.SetInt("level", 1);
+        }
+
         DontDestroyOnLoad(audioSource.gameObject);
         _levelNumber = PlayerPrefs.GetInt("level", _levelNumber);
         totalEnemiesToSpawn = (int)Mathf.Log(_levelNumber * 10, 1.1f);
