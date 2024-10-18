@@ -32,10 +32,12 @@ public class UIEnemy : MonoBehaviour
     public void StartHealth(int maxHealth)
     {
         Slider.value = Slider.maxValue = maxHealth;
+        UpdateSliderColor();
     }
 
     public void SetHealth(int health)
     {
         Slider.value = health;
+        UpdateSliderColor();
     }
 }

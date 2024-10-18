@@ -10,15 +10,18 @@ namespace Script
         public int health = 100; // Health of the unit
         public float attackRange = 1.5f; // Range within which the unit can attack
         public float attackCooldown = 1f; // Time between attacks
-
+        private Animator _animator;
+        
         private Enemy _targetEnemy; // The current enemy target
         private float _timeSinceLastAttack;
         private Canvas _canvas;
         private Slider _slider;
         private Image _getSliderImage;
+        private bool _isAttacked = false;
 
         private void Start()
         {
+            _animator = GetComponent<Animator>();
             _canvas = GetComponentInChildren<Canvas>();
             _slider = _canvas.GetComponentInChildren<Slider>();
             _getSliderImage = _slider.GetComponentInChildren<Image>();
@@ -36,6 +39,8 @@ namespace Script
                 // If there's no target, find the nearest enemy
                 if (!_targetEnemy || _targetEnemy.health <= 0)
                 {
+                    _isAttacked = false;
+                    _animator.SetBool("Attacked", false);
                     FindNextEnemy();
                 }
 
@@ -45,6 +50,8 @@ namespace Script
                     // If the unit is within range, attack the enemy
                     if (Vector2.Distance(transform.position, _targetEnemy.transform.position) <= attackRange)
                     {
+                        _isAttacked = true;
+                        _animator.SetBool("Attacked", true);
                         AttackEnemy();
                     }
                     else

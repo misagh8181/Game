@@ -65,8 +65,6 @@ public class Enemy : MonoBehaviour
     {
         health -= damage;
         health = Mathf.Clamp(health, 0, maxHealth); // Ensure health stays within bounds
-        _uiEnemy.Slider.value = health;
-        _uiEnemy.UpdateSliderColor();
         _uiEnemy.SetHealth(health);
 
         if (health <= 0)
