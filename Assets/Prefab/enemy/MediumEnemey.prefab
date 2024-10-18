@@ -211,7 +211,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 200
   m_Sprite: {fileID: 21300000, guid: 619d9824916f23a42b037087ae454684, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -581,7 +581,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 250
   m_Sprite: {fileID: 931757543, guid: 3c11151908285b344bfe5a8fa8f65c54, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -668,6 +668,8 @@ MonoBehaviour:
   damageToCastle: 10
   speed: 2
   stopTime: 6
+  bulletOfMediumEnemy: {fileID: 5968415199112270064, guid: 390de92a2ddd4f74f9489e456c426efe, type: 3}
+  fireGameObject: {fileID: 3162422370949581093, guid: a4ae2064a2d84124783e9a75d48a4e14, type: 3}
 --- !u!1 &8820650087546351222
 GameObject:
   m_ObjectHideFlags: 0

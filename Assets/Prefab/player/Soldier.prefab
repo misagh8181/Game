@@ -306,7 +306,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 3
   attackDamage: 30
-  health: 2000
+  health: 400
   attackRange: 1.5
   attackCooldown: 1
 --- !u!70 &-1938897727513063631

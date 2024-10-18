@@ -15,6 +15,8 @@ public class GameManager : MonoBehaviour
     public GameObject soldierPrefab;
     public GameObject archerPrefab;
 
+    public AudioSource audioSource;
+
     public Text moneyText;
     private int _enemiesSpawned; // Counter for spawned enemies
     private int _enemiesHandled; // Counter for defeated enemies
@@ -30,7 +32,7 @@ public class GameManager : MonoBehaviour
     private int _numberOfMissileEnemies;
 
 
-    private int _money = 400;
+    private int _money = 500;
 
 
     // private Vector2[] _archerSpawnPositions =
@@ -48,8 +50,10 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        DontDestroyOnLoad(audioSource.gameObject);
         _levelNumber = PlayerPrefs.GetInt("level", _levelNumber);
-        totalEnemiesToSpawn = PlayerPrefs.GetInt("totalEnemiesToSpawn", (int)Mathf.Log(_levelNumber * 10, 1.1f));
+        totalEnemiesToSpawn = (int)Mathf.Log(_levelNumber * 10, 1.1f);
+        _money = _levelNumber * 100 + 400;
         moneyText.text = _money.ToString();
 
         Time.timeScale = 1;
@@ -139,6 +143,7 @@ public class GameManager : MonoBehaviour
     public void LoadNextLevel()
     {
         Time.timeScale = 1;
+        PlayerPrefs.SetInt("level", ++_levelNumber);
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         // SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }

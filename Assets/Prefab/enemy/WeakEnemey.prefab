@@ -616,12 +616,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d196258f781efa44dbfa6eb762139eda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 500
+  maxHealth: 100
   health: 0
   damageToUnit: 20
   damageToCastle: 10
   speed: 2
   attackCooldown: 1
+  fireGameObject: {fileID: 3162422370949581093, guid: a4ae2064a2d84124783e9a75d48a4e14, type: 3}
 --- !u!114 &4508521219062128722
 MonoBehaviour:
   m_ObjectHideFlags: 0

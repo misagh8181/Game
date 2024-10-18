@@ -10,9 +10,12 @@ public class MediumEnemy : MonoBehaviour
     private Vector2 _castlePositionTarget;
     private GameManager _gameManager;
     private float _timeSinceEnteredCanvas;
+    private float _timeSinceLastFire;
     private UIEnemy _uiEnemy;
     private Animator _animator;
     private bool _hasStopped = false; // Boolean to control stopping and running animation
+    public GameObject bulletOfMediumEnemy;
+    public GameObject fireGameObject;
 
     private void Start()
     {
@@ -25,7 +28,8 @@ public class MediumEnemy : MonoBehaviour
         health = Random.Range(100, maxHealth);
 
         // Get random castle position target
-        _castlePositionTarget = Utils.GetRandomPositionInBounds(GameObject.FindWithTag("Castle").GetComponent<BoxCollider2D>().bounds);
+        _castlePositionTarget =
+            Utils.GetRandomPositionInBounds(GameObject.FindWithTag("Castle").GetComponent<BoxCollider2D>().bounds);
     }
 
     private void Update()
@@ -46,6 +50,7 @@ public class MediumEnemy : MonoBehaviour
         }
         else
         {
+            _timeSinceLastFire += Time.deltaTime;
             MoveTowardsCastle();
         }
     }
@@ -61,6 +66,17 @@ public class MediumEnemy : MonoBehaviour
 
     private void MoveTowardsCastle()
     {
+        if (speed == 0)
+        {
+            if (_timeSinceLastFire > 4f)
+            {
+                _timeSinceLastFire = 0f;
+                bulletOfMediumEnemy.transform.position = gameObject.transform.position;
+                Instantiate(bulletOfMediumEnemy, bulletOfMediumEnemy.transform.position,
+                    bulletOfMediumEnemy.transform.rotation);
+            }
+        }
+
         // Move the enemy towards the castle's position
         if (speed > 0)
         {
@@ -94,6 +110,11 @@ public class MediumEnemy : MonoBehaviour
             _gameManager.EnemyReachedCastle(damageToCastle);
             Destroy(gameObject);
         }
+        else if (other.CompareTag("Projectile"))
+        {
+            TakeDamage(100);
+            Destroy(other.gameObject);
+            Instantiate(fireGameObject, other.transform.position, Quaternion.identity);
+        }
     }
-    
 }

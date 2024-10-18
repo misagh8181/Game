@@ -16,6 +16,7 @@ public class Enemy : MonoBehaviour
     private float _timeSinceLastAttack;
     private UIEnemy _uiEnemy;
     private Animator _animator;
+    public GameObject fireGameObject;
 
     private void Start()
     {
@@ -90,6 +91,12 @@ public class Enemy : MonoBehaviour
         {
             _gameManager.EnemyReachedCastle(damageToCastle);
             Destroy(gameObject);
+        }
+        else if (other.CompareTag("Projectile"))
+        {
+            TakeDamage(70);
+            Destroy(other.gameObject);
+            Instantiate(fireGameObject, other.transform.position, Quaternion.identity);
         }
     }
 
